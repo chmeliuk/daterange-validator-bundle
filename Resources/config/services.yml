@@ -1,0 +1,7 @@
+services:
+    bestmodules.validator.datetime_intersect:
+        class: BestModules\DateTimeIntersectBundle\Validator\Constraints\DateTimeIntersectValidator
+        calls:
+            - ['setEntityManager', [@doctrine.orm.entity_manager]]
+        tags:
+            - { name: validator.constraint_validator, alias: datetime_intersect }

@@ -1,0 +1,14 @@
+{
+    "name": "bestmodules/datetime-intersect-bundle",
+    "type": "symfony-bundle",
+    "homepage": "https://github.com/bestmodules/datetime-intersect-bundle",
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "target-dir": "BestModules/DateTimeIntersectBundle",
+    "autoload": {
+        "psr-0": {
+            "BestModules\\DateTimeIntersectBundle": ""
+        }
+    }
+}
