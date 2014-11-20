@@ -3,7 +3,8 @@
     "type": "symfony-bundle",
     "homepage": "https://github.com/bestmodules/datetime-intersect-bundle",
     "require": {
-        "php": ">=5.4.0"
+        "php": ">=5.4.0",
+        "symfony/validator": "~2.5"
     },
     "target-dir": "BestModules/DateTimeIntersectBundle",
     "autoload": {
