@@ -1,7 +1,14 @@
 services:
     bestmodules.validator.datetime_intersect:
-        class: BestModules\DateTimeIntersectBundle\Validator\Constraints\DateTimeIntersectValidator
+        class: BestModules\DateRangeValidatorBundle\Validator\Constraints\DateTimeIntersectValidator
         calls:
             - ['setEntityManager', [@doctrine.orm.entity_manager]]
         tags:
             - { name: validator.constraint_validator, alias: datetime_intersect }
+            
+    bestmodules.validator.date_range:
+        class: BestModules\DateRangeValidatorBundle\Validator\Constraints\DateRangeValidator
+        calls:
+            - ['setEntityManager', [@doctrine.orm.entity_manager]]
+        tags:
+            - { name: validator.constraint_validator, alias: date_range }

@@ -1,5 +1,5 @@
 <?php
-namespace BestModules\DateTimeIntersectBundle\DependencyInjection;
+namespace BestModules\DateRangeValidatorBundle\DependencyInjection;
 
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

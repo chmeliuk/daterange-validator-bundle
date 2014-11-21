@@ -1,12 +1,12 @@
 <?php
-namespace BestModules\DateTimeIntersectBundle\Validator\Constraints;
+namespace BestModules\DateRangeValidatorBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Doctrine\ORM\EntityManager;
-use BestModules\DateTimeIntersectBundle\Validator\Constraints\DateTimeIntersect;
+use BestModules\DateRangeValidatorBundle\Validator\Constraints\DateTimeIntersect;
 
 class DateTimeIntersectValidator extends ConstraintValidator
 {
@@ -133,7 +133,7 @@ class DateTimeIntersectValidator extends ConstraintValidator
     }
 
     /**
-     * @param \BestModules\DateTimeIntersectBundle\Validator\Constraints\DateTimeIntersect $constraint
+     * @param \BestModules\DateRangeValidatorBundle\Validator\Constraints\DateTimeIntersect $constraint
      * @return array
      * @throws UnexpectedTypeException
      */
@@ -159,7 +159,7 @@ class DateTimeIntersectValidator extends ConstraintValidator
     }
     
     /**
-     * @param \BestModules\DateTimeIntersectBundle\Validator\Constraints\DateTimeIntersect $constraint
+     * @param \BestModules\DateRangeValidatorBundle\Validator\Constraints\DateTimeIntersect $constraint
      * @return array
      * @throws UnexpectedTypeException
      */

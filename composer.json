@@ -1,7 +1,7 @@
 {
-    "name": "bestmodules/datetime-intersect-bundle",
+    "name": "bestmodules/daterange-validator-bundle",
     "type": "symfony-bundle",
-    "homepage": "https://github.com/bestmodules/datetime-intersect-bundle",
+    "homepage": "https://github.com/bestmodules/daterange-validator-bundle",
     "require": {
         "php": ">=5.4.0",
         "symfony/validator": "~2.5"
