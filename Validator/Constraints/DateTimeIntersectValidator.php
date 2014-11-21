@@ -89,9 +89,11 @@ class DateTimeIntersectValidator extends ConstraintValidator
 
         $queryBuilder = $this->em->getRepository(get_class($entity))
             ->createQueryBuilder('dti')
-            ->where('dti.startDate <= :endDate AND dti.endDate >= :startDate')
-            ->setParameter('endDate', $class->getFieldValue($entity, $constraint->endDateField))
-            ->setParameter('startDate', $class->getFieldValue($entity, $constraint->startDateField))
+            ->where("dti.{$constraint->startDateField} <= :endDate AND dti.{$constraint->endDateField} >= :startDate")
+            ->setParameters(array(
+                'startDate' => $class->getFieldValue($entity, $constraint->startDateField),
+                'endDate' => $class->getFieldValue($entity, $constraint->endDateField),
+            ))
         ;
         
         foreach ($criteria as $field => $value) {
