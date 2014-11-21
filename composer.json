@@ -6,10 +6,10 @@
         "php": ">=5.4.0",
         "symfony/validator": "~2.5"
     },
-    "target-dir": "BestModules/DateTimeIntersectBundle",
+    "target-dir": "BestModules/DateRangeValidatorBundle",
     "autoload": {
         "psr-0": {
-            "BestModules\\DateTimeIntersectBundle": ""
+            "BestModules\\DateRangeValidatorBundle": ""
         }
     }
 }
