@@ -13,12 +13,13 @@ class DateTimeIntersect extends Constraint
     
     public $fields;
     
-    public $errorPath;
+    public $errorPath = array('startDate', 'endDate');
     
-    public $em;
+    public $startDateField = 'startDate';
     
-    public $repositoryMethod = 'findBy';
-    
+    public $endDateField = 'endDate';
+
+
     public function validatedBy()
     {
         return 'datetime_intersect';

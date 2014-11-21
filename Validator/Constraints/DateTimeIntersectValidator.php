@@ -7,7 +7,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Doctrine\ORM\EntityManager;
 use BestModules\DateTimeIntersectBundle\Validator\Constraints\DateTimeIntersect;
-use BestModules\DateTimeIntersectBundle\Library\DateTimeRangeInterface;
 
 class DateTimeIntersectValidator extends ConstraintValidator
 {
@@ -24,7 +23,7 @@ class DateTimeIntersectValidator extends ConstraintValidator
     /**
      * (StartDate1 <= EndDate2) and (StartDate2 <= EndDate1)
      * 
-     * @param DateTimeRangeInterface $entity
+     * @param object $entity
      * @param \Symfony\Component\Validator\Constraint $constraint
      */
     public function validate($entity, Constraint $constraint)
@@ -33,30 +32,37 @@ class DateTimeIntersectValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\DateTimeIntersect');
         }
         
-        if (!is_array($constraint->fields) && !is_string($constraint->fields)) {
-            throw new UnexpectedTypeException($constraint->fields, 'array');
+        $class = $this->em->getClassMetadata(get_class($entity));
+        /*@var $class \Doctrine\Common\Persistence\Mapping\ClassMetadata*/
+        
+        $errorPath = $this->getErrorPath($constraint);
+        
+        foreach ($errorPath as $fieldName) {
+            if (!$class->hasField($fieldName) && !is_null($fieldName)) {
+                throw new ConstraintDefinitionException(sprintf("The field '%s' is not mapped by Doctrine.", $fieldName));
+            }
         }
         
-        if (!is_null($constraint->errorPath) && !is_string($constraint->errorPath)) {
-            throw new UnexpectedTypeException($constraint->errorPath, 'string or null');
+        $fields = $this->getFields($constraint);
+        
+        switch (false) {
+            case $class->hasField($constraint->startDateField):
+                throw new ConstraintDefinitionException(sprintf('There isn`t field %s in entity %s', $constraint->startDateField, get_class($entity)));
+            case $class->hasField($constraint->endDateField):
+                throw new ConstraintDefinitionException(sprintf('There isn`t field %s in entity %s', $constraint->endDateField, get_class($entity)));
         }
         
-        if (!$entity->getStartDate() instanceof \DateTime && !is_null($entity->getStartDate())) {
+        $startDate = $class->getFieldValue($entity, $constraint->startDateField);
+        
+        if (!$startDate instanceof \DateTime) {
             throw new UnexpectedTypeException($entity->getStartDate(), '\DateTime');
         }
         
-        if (!$entity->getEndDate() instanceof \DateTime && !is_null($entity->getEndDate())) {
-            throw new UnexpectedTypeException($entity->getEndDate(), '\DateTime');
+        $endDate = $class->getFieldValue($entity, $constraint->endDateField);
+        
+        if (!$endDate instanceof \DateTime) {
+            throw new UnexpectedTypeException($endDate, '\DateTime');
         }
-        
-        $fields = (array) $constraint->fields;
-        
-        if (empty($fields)) {
-            throw new ConstraintDefinitionException('At least one field must be defined.');
-        }
-        
-        $class = $this->em->getClassMetadata(get_class($entity));
-        /*@var $class \Doctrine\Common\Persistence\Mapping\ClassMetadata*/
         
         $criteria = array();
         
@@ -81,12 +87,11 @@ class DateTimeIntersectValidator extends ConstraintValidator
             }
         }
 
-        $repository = $this->em->getRepository(get_class($entity));
-        $queryBuilder = $repository
+        $queryBuilder = $this->em->getRepository(get_class($entity))
             ->createQueryBuilder('dti')
             ->where('dti.startDate <= :endDate AND dti.endDate >= :startDate')
-            ->setParameter('endDate', $entity->getEndDate())
-            ->setParameter('startDate', $entity->getStartDate())
+            ->setParameter('endDate', $class->getFieldValue($entity, $constraint->endDateField))
+            ->setParameter('startDate', $class->getFieldValue($entity, $constraint->startDateField))
         ;
         
         foreach ($criteria as $field => $value) {
@@ -106,8 +111,6 @@ class DateTimeIntersectValidator extends ConstraintValidator
             return;
         }
         
-        $errorPath = is_null($constraint->errorPath) ? $fields[0] : $constraint->errorPath;
-        
         $names = array();
         
         foreach ($result as $range) {
@@ -115,13 +118,55 @@ class DateTimeIntersectValidator extends ConstraintValidator
                 $names[] = "{$range->getStartDate()->format('Y-m-d')} - {$range->getEndDate()->format('Y-m-d')}";
             }
         }
+        
+        foreach ($errorPath as $errorPathItem) {
+            $this
+                ->buildViolation(sprintf($constraint->message))
+                ->setParameter('{{ intersects }}', implode(', ', $names))
+                ->atPath($errorPathItem)
+                ->setInvalidValue($criteria[$fields[0]])
+                ->addViolation()
+            ;
+        }
+    }
 
-        $this
-            ->buildViolation(sprintf($constraint->message))
-            ->setParameter('{{ intersects }}', implode(', ', $names))
-            ->atPath($errorPath)
-            ->setInvalidValue($criteria[$fields[0]])
-            ->addViolation()
-        ;
+    /**
+     * @param \BestModules\DateTimeIntersectBundle\Validator\Constraints\DateTimeIntersect $constraint
+     * @return array
+     * @throws UnexpectedTypeException
+     */
+    protected function getErrorPath(DateTimeIntersect $constraint)
+    {
+        $result = array();
+        
+        switch (true) {
+            case is_null($constraint->errorPath):
+                $result[] = null;
+                break;
+            case is_string($constraint->errorPath):
+                $result[] = $constraint->errorPath;
+                break;
+            case is_array($constraint->errorPath):
+                $result = $constraint->errorPath;
+                break;
+            default:
+                throw new UnexpectedTypeException($constraint->errorPath, 'string, array or null');
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * @param \BestModules\DateTimeIntersectBundle\Validator\Constraints\DateTimeIntersect $constraint
+     * @return array
+     * @throws UnexpectedTypeException
+     */
+    protected function getFields(DateTimeIntersect $constraint)
+    {
+        if (!is_array($constraint->fields) && !is_string($constraint->fields)) {
+            throw new UnexpectedTypeException($constraint->fields, 'array or string');
+        }
+        
+        return (array)$constraint->fields;
     }
 }
