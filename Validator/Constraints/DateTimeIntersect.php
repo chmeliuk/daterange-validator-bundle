@@ -1,25 +1,14 @@
 <?php
 namespace BestModules\DateRangeValidatorBundle\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraint;
-
 /**
  * @Annotation
  * @Target({"CLASS", "ANNOTATION"})
  */
-class DateTimeIntersect extends Constraint
+class DateTimeIntersect extends AbstractDateRangeConstraint
 {
-    public $message = 'Dates are intersected';
-    
     public $fields;
     
-    public $errorPath = array('startDate', 'endDate');
-    
-    public $startDateField = 'startDate';
-    
-    public $endDateField = 'endDate';
-
-
     public function validatedBy()
     {
         return 'datetime_intersect';

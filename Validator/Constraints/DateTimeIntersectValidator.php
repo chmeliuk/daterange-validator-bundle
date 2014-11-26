@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Doctrine\ORM\EntityManager;
 use BestModules\DateRangeValidatorBundle\Validator\Constraints\DateTimeIntersect;
 
-class DateTimeIntersectValidator extends ConstraintValidator
+class DateTimeIntersectValidator extends AbstractDateRangeIntersectValidator
 {
     /**
      * @var EntityManager
@@ -35,7 +35,7 @@ class DateTimeIntersectValidator extends ConstraintValidator
         $class = $this->em->getClassMetadata(get_class($entity));
         /*@var $class \Doctrine\Common\Persistence\Mapping\ClassMetadata*/
         
-        $errorPath = $this->getErrorPath($constraint);
+        $errorPath = $this->getErrorPaths($constraint);
         
         foreach ($errorPath as $fieldName) {
             if (!$class->hasField($fieldName) && !is_null($fieldName)) {
@@ -135,32 +135,6 @@ class DateTimeIntersectValidator extends ConstraintValidator
                 ;
             }
         }
-    }
-
-    /**
-     * @param \BestModules\DateRangeValidatorBundle\Validator\Constraints\DateTimeIntersect $constraint
-     * @return array
-     * @throws UnexpectedTypeException
-     */
-    protected function getErrorPath(DateTimeIntersect $constraint)
-    {
-        $result = array();
-        
-        switch (true) {
-            case is_null($constraint->errorPath):
-                $result[] = null;
-                break;
-            case is_string($constraint->errorPath):
-                $result[] = $constraint->errorPath;
-                break;
-            case is_array($constraint->errorPath):
-                $result = $constraint->errorPath;
-                break;
-            default:
-                throw new UnexpectedTypeException($constraint->errorPath, 'string, array or null');
-        }
-        
-        return $result;
     }
     
     /**

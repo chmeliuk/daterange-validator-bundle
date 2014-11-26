@@ -52,4 +52,30 @@ abstract class AbstractDateRangeIntersectValidator extends ConstraintValidator
         
         return array_unique($invalidRanges);
     }
+    
+    /**
+     * @param \BestModules\DateRangeValidatorBundle\Validator\Constraints\AbstractDateRangeConstraint $constraint
+     * @return array
+     * @throws UnexpectedTypeException
+     */
+    protected function getErrorPaths(AbstractDateRangeConstraint $constraint)
+    {
+        $result = array();
+        
+        switch (true) {
+            case is_null($constraint->errorPath):
+                $result[] = null;
+                break;
+            case is_string($constraint->errorPath):
+                $result[] = $constraint->errorPath;
+                break;
+            case is_array($constraint->errorPath):
+                $result = $constraint->errorPath;
+                break;
+            default:
+                throw new UnexpectedTypeException($constraint->errorPath, 'string, array or null');
+        }
+        
+        return $result;
+    }
 }
