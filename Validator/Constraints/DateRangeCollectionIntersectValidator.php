@@ -16,10 +16,12 @@ class DateRangeCollectionIntersectValidator extends AbstractDateRangeIntersectVa
 
         $invalidRanges = $this->validateRanges($ranges, $constraint);
         
-        $this
-            ->buildViolation(sprintf($constraint->message))
-            ->setParameter('{{ intersects }}', implode(', ', $invalidRanges))
-            ->addViolation()
-        ;
+        if (!empty($invalidRanges)) {
+            $this
+                ->buildViolation(sprintf($constraint->message))
+                ->setParameter('{{ intersects }}', implode(', ', $invalidRanges))
+                ->addViolation()
+            ;
+        }
     }
 }
