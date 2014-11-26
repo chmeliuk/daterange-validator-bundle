@@ -86,7 +86,7 @@ class DateTimeIntersectValidator extends ConstraintValidator
                 $criteria[$fieldName] = array_pop($relatedId);
             }
         }
-
+        
         $queryBuilder = $this->em->getRepository(get_class($entity))
             ->createQueryBuilder('dti')
             ->where("dti.{$constraint->startDateField} <= :endDate AND dti.{$constraint->endDateField} >= :startDate")
@@ -95,20 +95,20 @@ class DateTimeIntersectValidator extends ConstraintValidator
                 'endDate' => $class->getFieldValue($entity, $constraint->endDateField),
             ))
         ;
-        
+
         foreach ($criteria as $field => $value) {
             $queryBuilder
                 ->andWhere("dti.{$field} = :{$field}")
                 ->setParameter($field, $value)
             ;
         }
-        
+
         $result = $queryBuilder->getQuery()->getResult();
         
         $result instanceof \Iterator 
                 ? $result->rewind() 
                 : reset($result);
-        
+
         if (count($result) === 0 || count($result) === 1 && $entity === ($result instanceof \Iterator ? $result->current() : current($result))) {
             return;
         }
@@ -116,19 +116,24 @@ class DateTimeIntersectValidator extends ConstraintValidator
         $names = array();
         
         foreach ($result as $range) {
-            if ($range !== $entity) {
+            // Check if Entity is not flushed
+            if ($class->getFieldValue($range, $constraint->startDateField) <= $class->getFieldValue($entity, $constraint->endDateField)
+                    && $class->getFieldValue($range, $constraint->endDateField) >= $class->getFieldValue($entity, $constraint->startDateField)
+                    && $range !== $entity) {
                 $names[] = "{$range->getStartDate()->format('Y-m-d')} - {$range->getEndDate()->format('Y-m-d')}";
             }
         }
         
-        foreach ($errorPath as $errorPathItem) {
-            $this
-                ->buildViolation(sprintf($constraint->message))
-                ->setParameter('{{ intersects }}', implode(', ', $names))
-                ->atPath($errorPathItem)
-                ->setInvalidValue($criteria[$fields[0]])
-                ->addViolation()
-            ;
+        if (!empty($names)) {
+            foreach ($errorPath as $errorPathItem) {
+                $this
+                    ->buildViolation(sprintf($constraint->message))
+                    ->setParameter('{{ intersects }}', implode(', ', $names))
+                    ->atPath($errorPathItem)
+                    ->setInvalidValue($criteria[$fields[0]])
+                    ->addViolation()
+                ;
+            }
         }
     }
 
