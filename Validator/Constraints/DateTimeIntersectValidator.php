@@ -53,12 +53,19 @@ class DateTimeIntersectValidator extends AbstractDateRangeIntersectValidator
         }
         
         $startDate = $class->getFieldValue($entity, $constraint->startDateField);
+        $endDate = $class->getFieldValue($entity, $constraint->endDateField);
         
+        if (null === $startDate || '' === $startDate || null === $endDate || '' === $endDate) {
+            return;
+        }
+
         if (!$startDate instanceof \DateTime) {
             throw new UnexpectedTypeException($entity->getStartDate(), '\DateTime');
         }
         
-        $endDate = $class->getFieldValue($entity, $constraint->endDateField);
+        if (!$startDate instanceof \DateTime) {
+            throw new UnexpectedTypeException($entity->getStartDate(), '\DateTime');
+        }
         
         if (!$endDate instanceof \DateTime) {
             throw new UnexpectedTypeException($endDate, '\DateTime');

@@ -68,16 +68,19 @@ class DateRangeValidator extends ConstraintValidator
             throw new ConstraintDefinitionException(sprintf(static::NOT_MAPPED_FIELD_ERROR), $endDateField);
         }
         
-        // Validate StartDate
         $startDate = $class->getFieldValue($entity, $startDateField);
+        $endDate = $class->getFieldValue($entity, $endDateField);
+
+        if (null === $startDate || '' === $startDate || null === $endDate || '' === $endDate) {
+            return;
+        }
         
+        // Validate StartDate
         if (!$startDate instanceof \DateTime) {
             throw new UnexpectedTypeException($startDate, '\DateTime');
         }
         
         // Validate EndDate
-        $endDate = $class->getFieldValue($entity, $endDateField);
-        
         if (!$endDate instanceof \DateTime) {
             throw new UnexpectedTypeException($endDate, '\DateTime');
         }
