@@ -54,7 +54,7 @@ class DateRangeValidator extends ConstraintValidator
         }
         
         if (!$class->hasField($startDateField)) {
-            throw new ConstraintDefinitionException(sprint(static::NOT_MAPPED_FIELD_ERROR), $startDateField);
+            throw new ConstraintDefinitionException(sprintf(static::NOT_MAPPED_FIELD_ERROR), $startDateField);
         }
         
         // Validate EndDateField
